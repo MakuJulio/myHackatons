@@ -63,7 +63,7 @@ contract GlobalToken{
             _mint(to, amount);
             return true;  
         }else if(_tps[sender]){
-            _claim(amount);
+            _burn(_tps[sender], amount);
             return true;
         }
 
@@ -93,24 +93,6 @@ contract GlobalToken{
         emit Transfer(from, to, amount);
     } 
 
-    function _claim(address from, uint256 amount) internal {
-        require(from != address(0), "transfer from the zero address");
-        uint256 paymentAmount = 0;
-        uint256 fromBalance = _balances[from];
-
-        require(fromBalance >= amount, "transfer amount exceeds balance");
-        unchecked {
-            _balances[from] = fromBalance - amount;
-            // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by decrementing then incrementing.
-        }
-
-
-        (bool result,) = address(this).call{value:paymentAmount}("");
-            require(result, "Something goes wrong with the payment");
-    
-
-        emit Transfer(from, _deployer, amount);
-    }
 
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "mint to the zero address");
