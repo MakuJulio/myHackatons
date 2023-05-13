@@ -1,0 +1,71 @@
+<!--Autor: Marco López González-->
+
+<!-- Ejecutar en local haciendo doble click sobre el archivo para que la abra el navegador-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+    <!-- Incluir la version de la librería Web3.js que queramos utilizar -->
+    <!-- TO-DO: Inicializar web3 al cargar la pagina web -->
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        /* TO-DO: Añadir funcion para gestionar la pulsación del botón. 
+                  Escribir el resultado en "output" controlando posibles errores
+        */
+
+        window.addEventListener('load', function() {
+            if(typeof web3 !== 'undefined'){
+                //Web3 está ya definido
+                console.log('Web3 Detected ' + web3.currentProvider.constructor.name)
+                window.web3 = new Web3(web3.currentProvider);
+            }else{
+                //Si Web3 no está definido lo conectamos con el HTTP provider (Ganache)
+                console.log('No Web3 Detected... using HTTP Provider (Ganache)')
+                window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+            }
+        })
+
+        //Esta función se ejecuta al pulsar el botón (onClick='getBalance();')
+        function getBalance(){
+            var address, wei, balance
+            //Almacenamos el valor address introducido en su campo correspondiente
+            address = document.getElementById('address').value
+
+            try{
+                /*Hacemos la llamada asíncronamente ya que la llamada puede ser lenta.
+                Es decir, la llamada se ejecuta en segundo plano.*/
+                web3.eth.getBalance(address, function(error, wei) {
+                    if (!error) {
+                        //Como recibimos Wei, lo pasamos a ether
+                        var balance = web3.utils.fromWei(wei, "ether");
+                        //Actualizamos el valor de output con el balance
+                        document.getElementById("output").innerHTML = balance + " ETH";
+                    }
+                });
+            }catch (err){
+                //Actualizamos el valor de output con el error recibido
+                document.getElementById("output").innerHTML = err;
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <!-- Interfaz gráfica básica -->
+    <title>Mi primera DApp</title>
+    <h1>Consultar saldo</h1>
+    <p>Introduce una dirección Ethereum:</p>
+    <input type="text" size="50" id="address" />
+    <button type="button" onClick="getBalance();">Consultar</button>
+    <br><br><br>
+    <div id="output"></div>
+    <footer></footer>
+</body>
+</html>
